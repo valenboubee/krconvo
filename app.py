@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import html
 import json
+import os
 import sys
 import threading
 import webbrowser
@@ -31,8 +32,11 @@ from progress import Progress
 def today() -> date:
     return date.today()
 
-HOST = "127.0.0.1"
-PORT = 5050
+# Hosting platforms (Render, Railway, Fly, etc.) inject $PORT and expect the
+# server to bind 0.0.0.0. Locally we stay on 127.0.0.1:5050 and open a browser.
+ON_SERVER = bool(os.environ.get("PORT"))
+PORT = int(os.environ.get("PORT") or os.environ.get("KCL_PORT") or 5050)
+HOST = os.environ.get("KCL_HOST") or ("0.0.0.0" if ON_SERVER else "127.0.0.1")
 MASTERY_THRESHOLD = 80
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -650,11 +654,18 @@ def main():
     print(f"Progress file: {PROGRESS.path}")
 
     httpd = ThreadingHTTPServer((HOST, PORT), Handler)
-    url = f"http://{HOST}:{PORT}/"
-    print(f"Korean Conversation Lab running at {url}")
+    local_url = f"http://127.0.0.1:{PORT}/"
+    print(f"Korean Conversation Lab listening on {HOST}:{PORT}")
+    if not ON_SERVER:
+        print(f"Open {local_url}")
     print("Press Ctrl+C to stop.")
-    if "--no-browser" not in sys.argv:
-        threading.Timer(0.6, lambda: webbrowser.open(url)).start()
+    if not ON_SERVER and "--no-browser" not in sys.argv:
+        def _open():
+            try:
+                webbrowser.open(local_url)
+            except Exception:
+                pass
+        threading.Timer(0.6, _open).start()
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

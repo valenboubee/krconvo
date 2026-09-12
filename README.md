@@ -16,6 +16,14 @@ Then open <http://127.0.0.1:5050> (it opens automatically). Press `Ctrl+C` to st
 
 Requires Python 3 (tested on 3.14). No packages to install.
 
+### Run it on another machine, or host it online
+
+Clone the repo anywhere and `python app.py` — that's the whole install. The server
+also reads `$PORT` (binds `0.0.0.0` when set) and `KCL_PROGRESS_DIR` (where to keep
+progress), so it drops onto a host with a persistent disk without code changes.
+See [DEPLOY.md](DEPLOY.md) for always-on hosting (Render / Fly.io) and why Vercel
+doesn't fit.
+
 ## What works now (Phases 0–2)
 
 - **Dashboard** with your progress and a **Study Today** entry point that

@@ -1,0 +1,3 @@
+# Korean Conversation Lab uses the Python standard library only — no packages.
+# This file exists so hosting platforms detect a Python app and there is a
+# build step to run. Intentionally empty.
