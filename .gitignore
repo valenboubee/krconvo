@@ -17,3 +17,6 @@ Thumbs.db
 
 # Vercel (if you deploy later)
 .vercel/
+
+# Accidental nested clone of this repo inside itself
+/krconvo/
