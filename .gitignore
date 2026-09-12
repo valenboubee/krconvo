@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Progress data lives in ~/.korean-conversation-lab/ (outside the repo),
+# but ignore any stray copies or corruption backups just in case.
+progress.json
+*.corrupt.json
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Vercel (if you deploy later)
+.vercel/
