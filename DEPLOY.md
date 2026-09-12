@@ -2,8 +2,9 @@
 
 This app is a small **persistent Python server** with a **local progress file**.
 That rules out Vercel/Netlify (serverless, no always-on process, no writable disk).
-It runs well on any host that gives you a **long-running process + a persistent
-disk**. The app is already prepared for this:
+It runs well on any host that gives you a **long-running process** (plus a
+persistent disk *if* you want progress to stick around). The app is already
+prepared for this:
 
 - It binds `0.0.0.0` and reads the host's `$PORT` automatically.
 - It stores progress wherever `KCL_PROGRESS_DIR` points — set that to a mounted disk.
@@ -15,31 +16,39 @@ disk**. The app is already prepared for this:
 
 ---
 
-## Option A — Render (easiest, browser-based)  ⭐ recommended
+## Option A — Render, free tier (easiest, browser-based)  ⭐ recommended
 
-**Cost, honestly:** keeping your progress needs a persistent disk, and disks are
-only on a **paid** instance (**Starter, ~$7/month**). Render's Free tier has no
-disk and sleeps after ~15 minutes, so on Free your progress resets and the first
-visit after a nap is slow. The Blueprint below asks for Starter for that reason.
+**Cost: free.** You get an HTTPS URL that works on laptop, phone, and tablet.
+Two trade-offs, both fine for casual study:
+
+- The service **sleeps after ~15 min idle**, so the first visit after a nap takes ~30s to wake.
+- There's **no persistent disk on free**, so progress is kept only in temporary
+  storage — it survives while the app is awake but **resets when it sleeps or
+  redeploys**. (Want it to stick forever? See "Keeping progress" below.)
 
 1. Go to <https://dashboard.render.com> and sign up / log in (you can sign in with GitHub).
 2. Click **New +** → **Blueprint**.
 3. Connect your GitHub and pick the **`valenboubee/krconvo`** repo. Render reads
-   [`render.yaml`](render.yaml) and pre-fills everything (start command, disk, env vars).
+   [`render.yaml`](render.yaml) and pre-fills everything (free plan, start command, env vars).
 4. (Optional) change the `region` near you — edit `render.yaml`, or just pick in the UI.
-5. Click **Apply**. Render confirms the Starter plan (~$7/mo) because of the disk — approve it.
+5. Click **Apply** — no card needed for the free plan.
 6. Wait for the first build/deploy (~1–2 min). When it's live, Render shows a URL like
-   `https://krconvo.onrender.com` — open that on your phone or laptop. Done.
+   `https://krconvo.onrender.com` — open that on any device. Done.
 
-Every future `git push` to `main` auto-redeploys. Your progress lives on the
-`/var/data` disk and **survives redeploys and restarts**.
+Every future `git push` to `main` auto-redeploys.
+
+**Keeping progress (optional, paid):** to make progress permanent, upgrade the
+service to **Starter (~$7/mo)** and add a **1 GB disk mounted at `/var/data`**,
+then set the env var `KCL_PROGRESS_DIR=/var/data`. That's the only difference —
+the app already stores progress wherever `KCL_PROGRESS_DIR` points.
 
 ---
 
-## Option B — Fly.io (cheaper, a bit more technical)
+## Option B — Fly.io (also cheap, keeps progress, a bit more technical)
 
 Fly runs a tiny always-on machine + a 1 GB volume for roughly **$2–3/month**
-(needs a card on file). It's CLI-driven rather than point-and-click.
+(needs a card on file). It's CLI-driven rather than point-and-click, and unlike
+free Render it **keeps your progress** and doesn't sleep.
 
 1. Install the CLI (PowerShell): `iwr https://fly.io/install.ps1 -useb | iex`
 2. `fly auth signup` (or `fly auth login`).

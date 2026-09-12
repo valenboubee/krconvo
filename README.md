@@ -21,8 +21,8 @@ Requires Python 3 (tested on 3.14). No packages to install.
 Clone the repo anywhere and `python app.py` — that's the whole install. The server
 also reads `$PORT` (binds `0.0.0.0` when set) and `KCL_PROGRESS_DIR` (where to keep
 progress), so it drops onto a host with a persistent disk without code changes.
-See [DEPLOY.md](DEPLOY.md) for always-on hosting (Render / Fly.io) and why Vercel
-doesn't fit.
+See [DEPLOY.md](DEPLOY.md) for web hosting — including a **free** Render deploy
+that works on phone/laptop/tablet — and why Vercel doesn't fit.
 
 ## What works now (Phases 0–2)
 
