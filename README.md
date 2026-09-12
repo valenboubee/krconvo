@@ -18,11 +18,11 @@ Requires Python 3 (tested on 3.14). No packages to install.
 
 ### Run it on another machine, or host it online
 
-Clone the repo anywhere and `python app.py` — that's the whole install. The server
-also reads `$PORT` (binds `0.0.0.0` when set) and `KCL_PROGRESS_DIR` (where to keep
-progress), so it drops onto a host with a persistent disk without code changes.
-See [DEPLOY.md](DEPLOY.md) for web hosting — including a **free** Render deploy
-that works on phone/laptop/tablet — and why Vercel doesn't fit.
+Clone the repo anywhere and `python app.py` — that's the whole install. The app
+also exposes a WSGI entry point (`app.application`) and reads `$PORT` and
+`KCL_PROGRESS_DIR`, so it hosts without code changes. See [DEPLOY.md](DEPLOY.md)
+for a **free, always-on** setup on PythonAnywhere (usable from phone/laptop/tablet,
+progress saved), plus other options and why Vercel doesn't fit.
 
 ## What works now (Phases 0–2)
 

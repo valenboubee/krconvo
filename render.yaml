@@ -1,24 +1,25 @@
-# Render Blueprint — one-click, FREE deploy of Korean Conversation Lab.
+# Render Blueprint — one-click deploy of Korean Conversation Lab.
 # In Render: New +  ->  Blueprint  ->  pick the krconvo repo  ->  Apply.
 #
-# This uses Render's free tier: no cost, HTTPS URL that works on any device.
-# Trade-offs (both fine for casual use):
-#   - The service sleeps after ~15 min idle, so the first hit after a nap takes
-#     ~30s to wake.
-#   - There is no persistent disk on free, so progress is kept only in temporary
-#     storage: it survives while the app is awake, but resets when it sleeps or
-#     redeploys. To keep progress permanently, see DEPLOY.md (paid disk, ~$7/mo).
+# NOTE ON COST: keeping your progress requires a persistent disk, and disks are
+# only available on a paid instance (Starter, ~$7/mo). Render's Free tier has no
+# disk and sleeps after ~15 min, so on Free your progress would reset. If you'd
+# rather not pay, see DEPLOY.md for a cheaper Fly.io path, or just run it locally.
 services:
   - type: web
     name: krconvo
     runtime: python
-    plan: free
+    plan: starter
     region: frankfurt          # change to your nearest: oregon, ohio, singapore, etc.
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
     autoDeploy: true           # redeploys automatically when you push to GitHub
     envVars:
       - key: KCL_PROGRESS_DIR
-        value: /tmp/kcl        # writable temp storage (ephemeral on free tier)
+        value: /var/data       # progress.json lives on the persistent disk below
       - key: PYTHON_VERSION
         value: 3.12.6
+    disk:
+      name: progress
+      mountPath: /var/data
+      sizeGB: 1

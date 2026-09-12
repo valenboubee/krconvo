@@ -504,144 +504,201 @@ def _refresh_mastery(module) -> dict:
 # HTTP handler
 # --------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Request routing. Kept as pure functions that return (status, content_type,
+# body_bytes) so both the stdlib http.server Handler (local `python app.py`)
+# and the WSGI `application` (PythonAnywhere / any WSGI host) share one code path.
+# ---------------------------------------------------------------------------
+
+HTML_CT = "text/html; charset=utf-8"
+JSON_CT = "application/json; charset=utf-8"
+TEXT_CT = "text/plain; charset=utf-8"
+
+STATIC_TYPES = {
+    ".css": "text/css; charset=utf-8",
+    ".js": "application/javascript; charset=utf-8",
+    ".mp3": "audio/mpeg",
+    ".ogg": "audio/ogg",
+}
+
+
+def _b(body):
+    return body.encode("utf-8") if isinstance(body, str) else body
+
+
+def _serve_static(rel):
+    target = (STATIC_DIR / rel).resolve()
+    if not str(target).startswith(str(STATIC_DIR.resolve())) or not target.is_file():
+        return 404, TEXT_CT, b"not found"
+    ctype = STATIC_TYPES.get(target.suffix, "application/octet-stream")
+    return 200, ctype, target.read_bytes()
+
+
+def _handle_get(path):
+    if path == "/":
+        return 200, HTML_CT, _b(page("Dashboard", render_dashboard(), "dashboard"))
+    if path.startswith("/static/"):
+        return _serve_static(path[len("/static/"):])
+    if path == "/review":
+        return 200, HTML_CT, _b(page("Review", render_review(), "review"))
+    if path == "/errors":
+        return 200, HTML_CT, _b(page("Error Log", render_errors(), "errors"))
+    if path.startswith("/lesson/"):
+        mid = path[len("/lesson/"):]
+        module = COURSE.get(mid)
+        if not module:
+            return 404, HTML_CT, _b(page("Not found", "<h1>Conversation not found</h1><a href='/'>← Dashboard</a>"))
+        with LOCK:
+            PROGRESS.mark_opened(mid)
+        return 200, HTML_CT, _b(page(module["meta"].get("title", mid), render_lesson(module), ""))
+    return 404, HTML_CT, _b(page("Not found", "<h1>404</h1><a href='/'>← Dashboard</a>"))
+
+
+def _handle_post(path, body_bytes):
+    try:
+        payload = json.loads(body_bytes or b"{}")
+    except (ValueError, json.JSONDecodeError):
+        return 400, JSON_CT, _b(json.dumps({"ok": False, "error": "bad json"}))
+    with LOCK:
+        if path == "/api/answer":
+            status, obj = _api_answer(payload)
+        elif path == "/api/rating":
+            status, obj = _api_rating(payload)
+        elif path == "/api/quiz":
+            status, obj = _api_quiz(payload)
+        elif path == "/api/review-rate":
+            status, obj = _api_review_rate(payload)
+        else:
+            status, obj = 404, {"ok": False, "error": "unknown endpoint"}
+    return status, JSON_CT, _b(json.dumps(obj))
+
+
+def dispatch(method, path, body_bytes=b""):
+    """Route one request. Returns (status:int, content_type:str, body:bytes)."""
+    if method in ("GET", "HEAD"):
+        return _handle_get(path)
+    if method == "POST":
+        return _handle_post(path, body_bytes)
+    return 405, TEXT_CT, b"method not allowed"
+
+
+# ---- API implementations (called under LOCK); each returns (status, obj) ----
+
+def _api_answer(p):
+    mid, ex = p.get("module"), p.get("exercise")
+    if not COURSE.get(mid):
+        return 404, {"ok": False, "error": "no module"}
+    PROGRESS.set_answer(mid, ex, p.get("answer", ""))
+    return 200, {"ok": True}
+
+
+def _api_rating(p):
+    mid, ex, rating = p.get("module"), p.get("exercise"), p.get("rating", "")
+    module = COURSE.get(mid)
+    if not module:
+        return 404, {"ok": False, "error": "no module"}
+    try:
+        PROGRESS.set_rating(mid, ex, rating)
+    except ValueError as e:
+        return 400, {"ok": False, "error": str(e)}
+
+    # Log an error entry only on "missed". log_error dedups by (source, prompt),
+    # so revisiting / replaying never creates duplicate rows.
+    if rating == "missed":
+        PROGRESS.log_error(mid, {
+            "type": p.get("kind", "production"),
+            "source": ex,
+            "prompt": p.get("prompt", ""),
+            "learner_answer": p.get("answer", ""),
+            "model_answer": p.get("model", ""),
+        })
+
+    res = _refresh_mastery(module)
+    return 200, {"ok": True, **res}
+
+
+def _api_quiz(p):
+    mid, ex, choice = p.get("module"), p.get("exercise"), p.get("choice")
+    module = COURSE.get(mid)
+    if not module:
+        return 404, {"ok": False, "error": "no module"}
+    qex = module["exercises"].get(ex)
+    if not qex or qex["type"] != "quiz":
+        return 404, {"ok": False, "error": "no quiz"}
+    try:
+        choice = int(choice)
+    except (TypeError, ValueError):
+        return 400, {"ok": False, "error": "bad choice"}
+    correct = 0 <= choice < len(qex["options"]) and qex["options"][choice]["correct"]
+    PROGRESS.set_quiz(mid, ex, choice, correct)
+    res = _refresh_mastery(module)
+    return 200, {"ok": True, "correct": bool(correct), "answer": qex["answer"], **res}
+
+
+def _api_review_rate(p):
+    try:
+        index = int(p.get("index"))
+    except (TypeError, ValueError):
+        return 400, {"ok": False, "error": "bad index"}
+    res = reviewbank.record_rating(COURSE, PROGRESS, today(), index, p.get("rating", ""))
+    code = 200 if res.get("ok") else 400
+    return code, res
+
+
+# ---- Local server: stdlib http.server Handler (used by `python app.py`) ----
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "KCL/0.1"
 
     def log_message(self, *args):  # keep the console quiet
         pass
 
-    # ---- helpers ----
-    def _send(self, code, body, ctype="text/html; charset=utf-8"):
-        data = body.encode("utf-8") if isinstance(body, str) else body
-        self.send_response(code)
+    def _respond(self, status, ctype, body):
+        self.send_response(status)
         self.send_header("Content-Type", ctype)
-        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         if self.command != "HEAD":
-            self.wfile.write(data)
+            self.wfile.write(body)
 
-    def _json(self, code, obj):
-        self._send(code, json.dumps(obj), "application/json; charset=utf-8")
-
-    def _serve_static(self, rel):
-        target = (STATIC_DIR / rel).resolve()
-        if not str(target).startswith(str(STATIC_DIR.resolve())) or not target.is_file():
-            return self._send(404, "not found", "text/plain")
-        ctype = {
-            ".css": "text/css; charset=utf-8",
-            ".js": "application/javascript; charset=utf-8",
-            ".mp3": "audio/mpeg",
-            ".ogg": "audio/ogg",
-        }.get(target.suffix, "application/octet-stream")
-        self._send(200, target.read_bytes(), ctype)
-
-    # ---- GET ----
     def do_GET(self):
-        path = urlparse(self.path).path
-
-        if path == "/":
-            return self._send(200, page("Dashboard", render_dashboard(), "dashboard"))
-
-        if path.startswith("/static/"):
-            return self._serve_static(path[len("/static/"):])
-
-        if path == "/review":
-            return self._send(200, page("Review", render_review(), "review"))
-
-        if path == "/errors":
-            return self._send(200, page("Error Log", render_errors(), "errors"))
-
-        if path.startswith("/lesson/"):
-            mid = path[len("/lesson/"):]
-            module = COURSE.get(mid)
-            if not module:
-                return self._send(404, page("Not found", "<h1>Conversation not found</h1><a href='/'>← Dashboard</a>"))
-            with LOCK:
-                PROGRESS.mark_opened(mid)
-            return self._send(200, page(module["meta"].get("title", mid), render_lesson(module), ""))
-
-        return self._send(404, page("Not found", "<h1>404</h1><a href='/'>← Dashboard</a>"))
+        self._respond(*dispatch("GET", urlparse(self.path).path))
 
     def do_HEAD(self):
-        self.do_GET()
+        self._respond(*dispatch("HEAD", urlparse(self.path).path))
 
-    # ---- POST (JSON API) ----
     def do_POST(self):
-        path = urlparse(self.path).path
         try:
             length = int(self.headers.get("Content-Length", 0))
-            payload = json.loads(self.rfile.read(length) or "{}")
-        except (ValueError, json.JSONDecodeError):
-            return self._json(400, {"ok": False, "error": "bad json"})
-
-        with LOCK:
-            if path == "/api/answer":
-                return self._api_answer(payload)
-            if path == "/api/rating":
-                return self._api_rating(payload)
-            if path == "/api/quiz":
-                return self._api_quiz(payload)
-            if path == "/api/review-rate":
-                return self._api_review_rate(payload)
-        return self._json(404, {"ok": False, "error": "unknown endpoint"})
-
-    # ---- API impls (called under LOCK) ----
-    def _api_answer(self, p):
-        mid, ex = p.get("module"), p.get("exercise")
-        if not COURSE.get(mid):
-            return self._json(404, {"ok": False, "error": "no module"})
-        PROGRESS.set_answer(mid, ex, p.get("answer", ""))
-        return self._json(200, {"ok": True})
-
-    def _api_rating(self, p):
-        mid, ex, rating = p.get("module"), p.get("exercise"), p.get("rating", "")
-        module = COURSE.get(mid)
-        if not module:
-            return self._json(404, {"ok": False, "error": "no module"})
-        try:
-            PROGRESS.set_rating(mid, ex, rating)
-        except ValueError as e:
-            return self._json(400, {"ok": False, "error": str(e)})
-
-        # Log an error entry only on "missed". log_error dedups by (source, prompt),
-        # so revisiting / replaying never creates duplicate rows.
-        if rating == "missed":
-            PROGRESS.log_error(mid, {
-                "type": p.get("kind", "production"),
-                "source": ex,
-                "prompt": p.get("prompt", ""),
-                "learner_answer": p.get("answer", ""),
-                "model_answer": p.get("model", ""),
-            })
-
-        res = _refresh_mastery(module)
-        return self._json(200, {"ok": True, **res})
-
-    def _api_quiz(self, p):
-        mid, ex, choice = p.get("module"), p.get("exercise"), p.get("choice")
-        module = COURSE.get(mid)
-        if not module:
-            return self._json(404, {"ok": False, "error": "no module"})
-        qex = module["exercises"].get(ex)
-        if not qex or qex["type"] != "quiz":
-            return self._json(404, {"ok": False, "error": "no quiz"})
-        try:
-            choice = int(choice)
         except (TypeError, ValueError):
-            return self._json(400, {"ok": False, "error": "bad choice"})
-        correct = 0 <= choice < len(qex["options"]) and qex["options"][choice]["correct"]
-        PROGRESS.set_quiz(mid, ex, choice, correct)
-        res = _refresh_mastery(module)
-        return self._json(200, {"ok": True, "correct": bool(correct), "answer": qex["answer"], **res})
+            length = 0
+        body = self.rfile.read(length) if length else b""
+        self._respond(*dispatch("POST", urlparse(self.path).path, body))
 
-    def _api_review_rate(self, p):
+
+# ---- Hosted server: WSGI entry point (PythonAnywhere / any WSGI host) ----
+
+_REASONS = {200: "OK", 400: "Bad Request", 404: "Not Found", 405: "Method Not Allowed"}
+
+
+def application(environ, start_response):
+    """WSGI callable. PythonAnywhere's WSGI file does `from app import application`."""
+    method = environ.get("REQUEST_METHOD", "GET")
+    path = environ.get("PATH_INFO", "/") or "/"
+    body = b""
+    if method == "POST":
         try:
-            index = int(p.get("index"))
+            length = int(environ.get("CONTENT_LENGTH") or 0)
         except (TypeError, ValueError):
-            return self._json(400, {"ok": False, "error": "bad index"})
-        res = reviewbank.record_rating(COURSE, PROGRESS, today(), index, p.get("rating", ""))
-        code = 200 if res.get("ok") else 400
-        return self._json(code, res)
+            length = 0
+        if length:
+            body = environ["wsgi.input"].read(length)
+    status, ctype, out = dispatch(method, path, body)
+    start_response(f"{status} {_REASONS.get(status, 'OK')}", [
+        ("Content-Type", ctype),
+        ("Content-Length", str(len(out))),
+    ])
+    return [b"" if method == "HEAD" else out]
 
 
 def main():

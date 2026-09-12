@@ -1,90 +1,73 @@
-# Deploying Korean Conversation Lab online
+# Hosting Korean Conversation Lab
 
-This app is a small **persistent Python server** with a **local progress file**.
-That rules out Vercel/Netlify (serverless, no always-on process, no writable disk).
-It runs well on any host that gives you a **long-running process** (plus a
-persistent disk *if* you want progress to stick around). The app is already
-prepared for this:
+This app is a small **persistent Python server** that saves your progress to a
+**file on the server**. That rules out Vercel/Netlify (serverless — no always-on
+process, and their disk is read-only). You want a host that runs a real process
+**and keeps your files**. The app is already prepared for this: it binds `$PORT`,
+serves over WSGI, and stores progress wherever `KCL_PROGRESS_DIR` points (or, by
+default, in your home folder, which most hosts keep).
 
-- It binds `0.0.0.0` and reads the host's `$PORT` automatically.
-- It stores progress wherever `KCL_PROGRESS_DIR` points — set that to a mounted disk.
-- It skips opening a browser when running on a server.
-
-> **Important — it's a single-user app.** Anyone who has the URL uses the *same*
-> progress. Keep the URL private. If you want a password on it, ask and I'll add a
-> simple login (one env var, ~15 lines) — it won't affect phone/laptop use.
+> **It's a single-user app.** Anyone with the URL shares your one progress file.
+> Keep the link to yourself. Want a password? Ask and I'll add one (a few lines,
+> one env var — it won't get in the way of phone/laptop use).
 
 ---
 
-## Option A — Render, free tier (easiest, browser-based)  ⭐ recommended
+## Option A — PythonAnywhere (FREE, always-on, saves progress)  ⭐ recommended
 
-**Cost: free.** You get an HTTPS URL that works on laptop, phone, and tablet.
-Two trade-offs, both fine for casual study:
+Free forever, runs even when your computer is off, and your progress is kept on
+PythonAnywhere's persistent disk. Works on laptop, phone, and tablet at
+`https://YOURNAME.pythonanywhere.com`.
 
-- The service **sleeps after ~15 min idle**, so the first visit after a nap takes ~30s to wake.
-- There's **no persistent disk on free**, so progress is kept only in temporary
-  storage — it survives while the app is awake but **resets when it sleeps or
-  redeploys**. (Want it to stick forever? See "Keeping progress" below.)
+**One-time setup (all in the browser):**
 
-1. Go to <https://dashboard.render.com> and sign up / log in (you can sign in with GitHub).
-2. Click **New +** → **Blueprint**.
-3. Connect your GitHub and pick the **`valenboubee/krconvo`** repo. Render reads
-   [`render.yaml`](render.yaml) and pre-fills everything (free plan, start command, env vars).
-4. (Optional) change the `region` near you — edit `render.yaml`, or just pick in the UI.
-5. Click **Apply** — no card needed for the free plan.
-6. Wait for the first build/deploy (~1–2 min). When it's live, Render shows a URL like
-   `https://krconvo.onrender.com` — open that on any device. Done.
+1. **Sign up** for the free **Beginner** plan at <https://www.pythonanywhere.com>.
 
-Every future `git push` to `main` auto-redeploys.
+2. **Get the code onto it.** The repo is private, so the simplest path is to make
+   it public first (it has no secrets — just app code and Korean lessons):
+   - Easiest: tell me and I'll flip `valenboubee/krconvo` to public for you.
+   - Then, on PythonAnywhere: open a **Bash console** (Consoles tab) and run:
+     ```bash
+     git clone https://github.com/valenboubee/krconvo.git
+     ```
+   - *Prefer to keep it private?* Create a GitHub token (repo scope) and clone with
+     `git clone https://TOKEN@github.com/valenboubee/krconvo.git` instead.
 
-**Keeping progress (optional, paid):** to make progress permanent, upgrade the
-service to **Starter (~$7/mo)** and add a **1 GB disk mounted at `/var/data`**,
-then set the env var `KCL_PROGRESS_DIR=/var/data`. That's the only difference —
-the app already stores progress wherever `KCL_PROGRESS_DIR` points.
+3. **Create the web app.** Go to the **Web** tab → **Add a new web app** →
+   **Manual configuration** (not Django/Flask) → pick **Python 3.10** or newer.
 
----
+4. **Wire up the app.** On the Web tab, click the **WSGI configuration file** link.
+   Delete everything in that editor and paste the contents of
+   [`deploy/pythonanywhere_wsgi.py`](deploy/pythonanywhere_wsgi.py). Change
+   `USERNAME` to your PythonAnywhere username. **Save.**
 
-## Option B — Fly.io (also cheap, keeps progress, a bit more technical)
+5. *(Optional, faster)* Still on the Web tab, add a **Static files** mapping:
+   URL `/static/` → Directory `/home/YOURNAME/krconvo/static`.
 
-Fly runs a tiny always-on machine + a 1 GB volume for roughly **$2–3/month**
-(needs a card on file). It's CLI-driven rather than point-and-click, and unlike
-free Render it **keeps your progress** and doesn't sleep.
+6. Click the big green **Reload** button. Open
+   `https://YOURNAME.pythonanywhere.com` on any device. Done.
 
-1. Install the CLI (PowerShell): `iwr https://fly.io/install.ps1 -useb | iex`
-2. `fly auth signup` (or `fly auth login`).
-3. In the project folder: `fly launch --no-deploy` — accept Python detection, choose a
-   name and region, and say **no** to Postgres/Redis.
-4. Create the volume (same region you picked): `fly volumes create data --size 1`
-5. In the generated **`fly.toml`**, make sure it has:
+**Keep it alive:** free apps ask you to click a "Run until 3 months from now"
+button every ~3 months (they email you a reminder). One click, stays free.
 
-   ```toml
-   [env]
-     KCL_PROGRESS_DIR = "/data"
-     PORT = "8080"
-
-   [http_service]
-     internal_port = 8080
-     force_https = true
-     auto_stop_machines = false
-     min_machines_running = 1     # keep it always on (no cold start)
-
-   [[mounts]]
-     source = "data"
-     destination = "/data"
-   ```
-6. `fly deploy`. Open the `https://<your-app>.fly.dev` URL it prints.
+**Update it later** (e.g. when I add lessons): in a PythonAnywhere Bash console,
+`cd krconvo && git pull`, then hit **Reload** on the Web tab.
 
 ---
 
-## Option C — Don't host it; run it locally anywhere
+## Other options
 
-The GitHub repo already makes it portable. On any computer with Python:
+### B — Your laptop + a free private link (Tailscale)
+No hosting, no code changes, fully private. Install [Tailscale](https://tailscale.com)
+(free) on your laptop and your phone/tablet, run `python app.py` on the laptop, and
+open its Tailscale address from the other devices. Catch: only works while your
+laptop is on and running the app.
 
-```bash
-git clone https://github.com/valenboubee/krconvo.git
-cd krconvo
-python app.py
-```
+### C — Managed paid hosts (Render / Fly.io)
+If you ever want zero-maintenance always-on hosting and don't mind ~$3–7/month,
+[`render.yaml`](render.yaml) is a one-click Render Blueprint (with a persistent
+disk), and Fly.io works too. Not needed for free use — Option A covers that.
 
-Free, fully private, and the original offline single-user design. The only
-limitation is it runs on that one machine while the terminal is open.
+### D — Just run it locally
+On any computer with Python: `git clone` this repo and `python app.py`. Free and
+fully private; runs only on that machine while the terminal is open.
