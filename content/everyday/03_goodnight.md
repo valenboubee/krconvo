@@ -1,6 +1,6 @@
 ---
 id: goodnight-01
-title: "Goodnight texts"
+title: "Sharing a good day"
 phase: 1
 turn: 1
 minutes: 25
@@ -12,52 +12,52 @@ relationship: romantic_partner
 themes:
   - relationship
   - evening
-  - comfort
+  - sharing
 grammar:
   - -았/었어? (casual past)
-  - -어도 돼
-  - -잖아 (reassuring)
-  - 잘 자 / 푹 자 / 좋은 꿈 꿔
+  - -더라
+  - -ㄹ래?
+  - -고 싶다
 vocabulary:
-  - 졸리다
-  - 피곤하다
-  - 푹 자다
-  - 하루
-  - 꿈
+  - 신나다
+  - 재밌다
+  - 맛있다
+  - 예쁘다
+  - 새로 생기다
 ---
 
 ## A. Context
 
-It's late and two people who are dating are texting before falling asleep. Notice
-how one of them **checks in on the other's day**, **acknowledges** that she's tired,
-and **sends her off to rest warmly** — comforting her rather than telling her what
-to do. All in casual speech (반말).
+It's late and two people who are dating are texting before sleep. One of them had
+a fun day and can't wait to tell the other about it. Notice how they **share the
+excitement together**, ask happy follow-up questions, and make a little plan to do
+it together. All in casual speech (반말).
 
 ## B. Conversation
 
-**수민:** 오빠 자? 나 이제 막 누웠어.
-> Are you asleep? I just lay down.
+**수민:** 오빠 자? 나 아직 안 졸려.
+> Are you asleep? I'm not sleepy yet.
 
-**지훈:** 아직 안 자. 오늘 하루 어땠어?
-> Not yet. How was your day?
+**지훈:** 나도 아직 안 자. 오늘 뭐 했어? 왠지 기분 좋아 보여.
+> I'm still up too. What did you do today? You seem like you're in a good mood somehow.
 
-**수민:** 좀 정신없었어. 일이 계속 밀려서 피곤하네.
-> It was kind of hectic. Work kept piling up, so I'm tired.
+**수민:** 어떻게 알았어! 오늘 친구랑 새로 생긴 카페 갔는데 완전 좋았어.
+> How did you know! I went to a newly-opened café with a friend today, and it was really great.
 
-**지훈:** 고생했어. 그래도 오늘 하루도 잘 버텼잖아. 이제 푹 쉬어도 돼.
-> You worked hard. Still, you made it through today too, you know. You can rest now.
+**지훈:** 오 좋았겠다. 뭐 먹었어?
+> Oh, that sounds nice. What did you have?
 
-**수민:** 응, 오빠랑 얘기하니까 좀 풀린다.
-> Yeah, talking with you makes me feel a bit better.
+**수민:** 딸기 케이크 먹었는데 진짜 맛있더라. 사진도 엄청 예쁘게 나왔어.
+> I had strawberry cake and it was so good. The photos came out super pretty too.
 
-**지훈:** 다행이다. 나도 지금 너 옆에 있고 싶다.
-> I'm glad. I wish I were right next to you.
+**지훈:** 오 완전 내 스타일인데. 나도 먹어 보고 싶다.
+> Oh, totally my style. I want to try it too.
 
-**수민:** 헤헤. 내일은 좀 일찍 끝났으면 좋겠어. 오빠 보고 싶어.
-> Hehe. I hope I finish a bit earlier tomorrow. I miss you.
+**수민:** 그치? 다음에 오빠랑 같이 가고 싶어. 오빠도 분명 좋아할 거야.
+> Right? I want to go with you next time. You'll definitely love it too.
 
-**지훈:** 나도 보고 싶어. 내일은 오늘보다 나을 거야. 오늘은 아무 걱정 말고 푹 자. 좋은 꿈 꿔.
-> I miss you too. Tomorrow will be better than today. Don't worry about anything tonight — just sleep well. Sweet dreams.
+**지훈:** 완전 좋지. 그럼 이번 주말에 같이 갈래? 생각만 해도 벌써 신난다.
+> Sounds perfect. So wanna go together this weekend? Just thinking about it, I'm already excited.
 
 ## C. Understand the Conversation
 
@@ -66,34 +66,34 @@ Try to answer before you reveal each answer.
 ### C1. Meaning checks
 
 [[card]]
-Q: When 수민 says she's tired from work, how does 지훈 respond?
-A: He acknowledges her effort and reassures her that she can rest — "고생했어. 그래도 오늘 하루도 잘 버텼잖아. 이제 푹 쉬어도 돼." He comforts her instead of telling her what to do.
+Q: What made 수민's day good?
+A: She went to a newly-opened café with a friend and loved it — the strawberry cake was delicious and her photos came out pretty. "새로 생긴 카페 갔는데 완전 좋았어."
 [[/card]]
 
 [[card]]
-Q: What does 수민 mean by "오빠랑 얘기하니까 좀 풀린다"?
-A: Talking with him makes her feel a bit better / more relaxed — the stress "unwinds." 풀리다 here means tension easing.
+Q: What do they decide at the end?
+A: To go to the café together this weekend — 지훈 suggests "이번 주말에 같이 갈래?" and says he's already excited.
 [[/card]]
 
 ### C2. Line reconstruction
 
 [[respond]]
-Q: Fill in the blank: "이제 푹 ______ 돼." (You can rest now.)
-A: 쉬어도
+Q: Fill in the blank: "다음에 오빠랑 같이 ______ 싶어." (I want to go together next time.)
+A: 가고
 [[/respond]]
 
 ### C3. Korean → English meaning
 
 [[card]]
-Q: What does "좋은 꿈 꿔" mean, and when do you say it?
-A: "Sweet dreams" (literally "dream a good dream"). A warm way to end a goodnight text.
+Q: What does "맛있더라" express that "맛있어" doesn't?
+A: -더라 shares something you personally experienced or discovered — "it was delicious (I tried it, let me tell you)." It's the natural way to report a nice find to someone.
 [[/card]]
 
 ### C4. English → Korean retrieval
 
 [[respond]]
-Q: Ask in casual Korean: "How was your day?"
-A: 오늘 하루 어땠어?
+Q: Ask in casual Korean: "What did you do today?"
+A: 오늘 뭐 했어?
 [[/respond]]
 
 ## D. Language You Need
@@ -105,65 +105,69 @@ A: 오늘 하루 어땠어?
 
 **Used here:**
 
-> 오늘 하루 어땠어?   (어떻다 → 어땠어)
+> 오늘 뭐 했어?   ·   뭐 먹었어?
 
 **What changes:**
+- 하다 → 했어? (did you do?)
 - 먹다 → 먹었어? (did you eat?)
-- 자다 → 잤어? (did you sleep?)
 
 [[respond]]
-Q: Ask casually: "Did you eat?"
-A: 밥 먹었어?
+Q: Ask casually: "What did you eat?"
+A: 뭐 먹었어?
 [[/respond]]
 
-### -어도 돼 — "you can... / it's okay to..."
+### -더라 — "it was... (I found out / let me tell you)"
 
-**Meaning:** Reassure or give gentle permission — much softer than telling someone
-what to do. Great for comforting.
+**Meaning:** Share something you personally saw, tasted, or experienced. Perfect
+for telling someone about a nice discovery.
 
 **Used here:**
 
-> 이제 푹 쉬어도 돼.
+> 진짜 맛있더라.
 
 **What changes:**
-- 쉬다 → 쉬어도 돼 (you can rest)
-- 자다 → 자도 돼 (you can sleep)
+- 맛있다 → 맛있더라 (it was delicious)
+- 예쁘다 → 예쁘더라 (it was pretty)
+- 재밌다 → 재밌더라 (it was fun)
 
 [[respond]]
-Q: Reassure her: "You can sleep now."
-A: 이제 자도 돼.
+Q: Share a discovery: "That movie was really fun." (use -더라)
+A: 그 영화 진짜 재밌더라.
 [[/respond]]
 
-### Warm goodnight lines (set phrases)
+### -ㄹ래? — casual invitation ("wanna...?")
 
-**Meaning:** A few phrases to close the night warmly.
+**Meaning:** A relaxed way to invite someone to do something together.
 
-- 고생했어 — "you worked hard / well done getting through it"
-- 잘 자 / 푹 자 — "sleep well / sleep deeply"
-- 좋은 꿈 꿔 — "sweet dreams"
+**Used here:**
+
+> 같이 갈래?
+
+**What changes:**
+- 가다 → 갈래? (wanna go?)
+- 보다 → 볼래? (wanna watch?)
+- 먹다 → 먹을래? (wanna eat?)
 
 [[respond]]
-Q: Send her off to sleep warmly — say goodnight and sweet dreams.
-A:
-- 잘 자, 좋은 꿈 꿔.
-- 오늘 고생했어. 푹 자.
+Q: Invite casually: "Wanna watch a movie together?"
+A: 같이 영화 볼래?
 [[/respond]]
 
 ## E. Active Production
 
 [[respond]]
-Q: Acknowledge her hard day: "You worked really hard today." (casual)
-A: 오늘 고생 많았어.
+Q: Say your day was great: "Today was really great." (casual)
+A: 오늘 진짜 좋았어.
 [[/respond]]
 
 [[respond]]
-Q: Reassure her with -잖아: "You made it through today too."
-A: 오늘 하루도 잘 버텼잖아.
+Q: Share a nice find with -더라: "That café was really pretty."
+A: 그 카페 진짜 예쁘더라.
 [[/respond]]
 
 [[respond]]
-Q: Encourage her about tomorrow: "Tomorrow will be better than today."
-A: 내일은 오늘보다 나을 거야.
+Q: Suggest going together with -ㄹ래?: "Wanna go together this weekend?"
+A: 이번 주말에 같이 갈래?
 [[/respond]]
 
 ## F. Speaking Practice
@@ -174,90 +178,87 @@ to check your understanding.
 **Recall:** Hide the Korean. Look at the English meaning and say the Korean line
 aloud, then reveal to compare.
 
-**Role practice:** Your partner texts the line below. Reply aloud in your own warm
-style — acknowledge, then comfort or reassure — then check the model answers.
+**Role practice:** Your partner texts the line below. Reply aloud with genuine
+interest — react, then ask to hear more — then check the model answers.
 
 [[respond]]
-Q: Partner: "나 오늘 너무 피곤해. 이제 잘래." — reply warmly.
+Q: Partner: "오늘 진짜 재밌는 일 있었어!" — react and ask more.
 A:
-- 오늘 고생 많았어. 푹 자, 좋은 꿈 꿔.
-- 응, 이제 쉬어도 돼. 잘 자.
-- 자고 일어나면 좀 나아질 거야. 잘 자.
+- 오 뭔데? 얘기해 줘.
+- 진짜? 완전 궁금해!
+- 좋았겠다. 무슨 일이야?
 [[/respond]]
 
 ## G. Transfer
 
-Same warm, comforting language — new moment: she can't fall asleep because she's a
-little nervous about tomorrow.
+Same happy, sharing language — new moment: this time *you* tell *her* about
+something fun you did today.
 
 [[respond]]
-Q: She texts "내일 때문에 긴장돼서 잠이 안 와." Reassure her gently.
+Q: Share your own good news: tell her you found a great new restaurant today. (use -더라)
 A:
-- 너무 걱정하지 않아도 될 것 같아. 잘 준비했잖아.
-- 다 잘될 거야. 이제 마음 편하게 자도 돼.
+- 나 오늘 새로 생긴 식당 갔는데 완전 맛있더라.
+- 오늘 점심에 맛집 발견했어. 다음에 같이 가자.
 [[/respond]]
 
 [[respond]]
-Q: Wish her goodnight warmly — tell her you miss her and to have sweet dreams.
-A:
-- 보고 싶다. 잘 자, 좋은 꿈 꿔.
-- 오늘도 고생했어. 내 꿈 꿔.
+Q: Invite her using -ㄹ래?: "Wanna go this weekend?"
+A: 이번 주말에 같이 갈래?
 [[/respond]]
 
 ### Personal answer
 
-Answer this in your own words. There's no wrong answer — the model is just one warm
-example of the acknowledge → reassure → encourage style. Compare: did you comfort
-her rather than tell her what to do?
+Answer this about your own life. There's no wrong answer — the model is just one
+natural example. Compare: did you get the good moment across?
 
 [[respond]]
-Q: 오빠는 여자친구가 힘든 하루를 보낸 날, 자기 전에 뭐라고 말해 줄 거야?
-A: 오늘 진짜 고생 많았어. 그래도 하루 종일 잘 버텼잖아. 이제 아무 걱정 말고 푹 자. 내일은 분명히 오늘보다 나을 거야. 좋은 꿈 꿔. | You really worked so hard today. Still, you got through the whole day, you know? Now don't worry about anything and sleep well. Tomorrow will definitely be better than today. Sweet dreams.
+Q: 오늘 하루 중에 제일 좋았던 일은 뭐였어?
+A: 오늘 점심에 친구랑 새로 생긴 파스타집에 갔는데 진짜 맛있더라. 날씨도 좋아서 조금 걷기도 하고, 오랜만에 기분 전환돼서 좋았어. | Today for lunch I went to a newly-opened pasta place with a friend and it was so good. The weather was nice so we walked a bit too, and it was a good change of pace for the first time in a while.
 [[/respond]]
 
 ## Quiz Check
 
 [[quiz]]
-Q: When 수민 says she's tired from work, what does 지훈 do?
-- Tells her she should manage her time better.
-* Acknowledges her hard day and reassures her she can rest.
-- Changes the subject.
-- Tells her to stop complaining.
+Q: Why was 수민 in a good mood?
+- She finished a stressful project.
+* She went to a new café she loved with a friend.
+- She got to sleep early.
+- She was talking to a coworker.
 [[/quiz]]
 
 [[quiz]]
-Q: What does "-어도 돼" add in "이제 푹 쉬어도 돼"?
-- It orders her to rest.
-* It gently gives permission / reassurance ("you can rest now").
-- It asks whether she rested.
-- It expresses regret.
+Q: What does "-더라" do in "진짜 맛있더라"?
+* Shares something you personally experienced ("it was delicious — let me tell you").
+- Asks whether it was delicious.
+- Tells someone to eat.
+- Says it will be delicious later.
 [[/quiz]]
 
 [[quiz]]
-Q: "좋은 꿈 꿔" means:
-- Have a good day.
-* Sweet dreams.
-- Get well soon.
-- Text me later.
+Q: "같이 갈래?" means:
+- Did you go together?
+* Wanna go together?
+- Let's not go.
+- I went together.
 [[/quiz]]
 
 [[quiz]]
-Q: Which goodnight message best matches 지훈's warm style?
-- 그만 좀 하고 얼른 자. 피곤하게 왜 그래.
-* 오늘 고생했어. 아무 걱정 말고 푹 자, 좋은 꿈 꿔.
-- 아직도 안 잤어? 빨리 안 자?
-- 네 문제는 네가 알아서 해결해.
+Q: How do 수민 and 지훈 end the chat?
+- By saying goodnight and going straight to sleep.
+* By making a happy plan to visit the café together this weekend.
+- By deciding what to cook for dinner.
+- By talking about work.
 [[/quiz]]
 
 ## Mastery Check
 
 You've engaged with this conversation when you can:
 
-- follow how 지훈 checks in on 수민's day and comforts her,
-- ask about someone's day casually (오늘 하루 어땠어?),
-- reassure with -어도 돼 ("이제 쉬어도 돼") instead of giving orders,
-- close the night warmly (고생했어 / 푹 자 / 좋은 꿈 꿔),
-- and say one warm goodnight thing in your own voice.
+- follow the fun thing 수민 shares and the plan they make,
+- ask about someone's day casually (오늘 뭐 했어?),
+- share a nice discovery with -더라 (맛있더라 / 재밌더라),
+- invite someone with -ㄹ래? (같이 갈래?),
+- and tell one good thing from your own day.
 
 Completion means "I engaged with this and can retrieve most of the key language" —
 not "I'm fluent." You can reopen it any time.

@@ -18,6 +18,6 @@ written original, not copied from published books.
 |--------|-------|--------|
 | `plans-01` | What should we do tonight? | original |
 | `encourage-01` | First-day nerves | original |
-| `goodnight-01` | Goodnight texts | original |
+| `goodnight-01` | Sharing a good day | original |
 
 _Add a row here whenever you add a conversation._
