@@ -207,6 +207,25 @@ code { background: #eceae3; padding: .1em .4em; border-radius: 5px; font-size: .
 .mini-label { font-size: .7rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; margin-right: .3rem; }
 .error-note { margin-top: .5rem; font-size: .9rem; color: var(--ink-soft); }
 
+/* ---- Reconstruction (spec §21) ---- */
+.exercise.reconstruct .tag { color: #3a5a86; background: #e9eff7; }
+.recon-en { color: var(--ink-soft); font-style: italic; margin: .3rem 0 0; }
+.recon-line { font-size: var(--ko-size); line-height: 1.45; margin: .3rem 0; }
+.recon-blank {
+  display: inline-block; min-width: 3.2rem; text-align: center;
+  background: #fbf3df; color: var(--gold); font-weight: 700;
+  border-radius: 6px; padding: 0 .35rem;
+}
+.recon-convo { display: flex; flex-direction: column; gap: .55rem; margin: .5rem 0; }
+.recon-full { font-size: 1.05rem; color: var(--ink-soft); margin-top: .3rem; }
+.recon-skeleton {
+  background: #fcfcfa; border: 1px solid var(--line); border-radius: 8px;
+  padding: .6rem .9rem; margin: .3rem 0;
+}
+.recon-skeleton p { margin: .2rem 0 .6rem; }
+.recon-vocab { display: flex; flex-wrap: wrap; gap: .4rem; list-style: none; padding-left: 0; margin: .2rem 0 0; }
+.recon-vocab li { background: var(--accent-soft); color: var(--accent); font-size: 1rem; padding: .1rem .55rem; border-radius: 999px; }
+
 @media (max-width: 560px) {
   .turn { grid-template-columns: 1fr; gap: .2rem; }
   :root { --ko-size: 1.4rem; }

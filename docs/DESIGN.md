@@ -109,16 +109,40 @@ once… / the more… / it'll probably…" (Korean: -잖아 reassuring, 하다 �
 ~하는 게 좋아) aren't banned, but must not be what *characterizes* his speech.
 `content/everyday/02_new_start.md` is the reference example of this style.
 
+## Conversation reconstruction (§21)
+
+A generated in-lesson section ("Reconstruct the Conversation"), rendered after
+Section G and before the Quiz. `engine.reconstruction(module)` builds the items
+**deterministically from the conversation's turns** — nothing is authored in the
+`.md`, so every conversation (and every future one) gets them for free. Four
+kinds, ramping in difficulty:
+
+- **speaker recall** — English → the Korean line (up to 3, spread evenly),
+- **missing phrase** — one line with a learning-point word blanked; the blank
+  prefers a frontmatter vocabulary/grammar token, else the line's last word (2),
+- **missing line** — a whole line blanked, shown with its surrounding lines and
+  an English meaning hint; never the opener (2),
+- **skeleton** — rebuild the whole dialogue from situation + speakers + key
+  vocabulary, then reveal (1).
+
+IDs are stable and namespaced: `-rs{n}` / `-rp{n}` / `-rl{n}` / `-rk1`. Each item
+reuses the existing try → reveal → self-rate widget, so persistence,
+refresh-safety and the error log come for free. Reconstruction is **retrieval
+practice only**: its ids are deliberately excluded from `recall_ids`/`quiz_ids`,
+so it never changes a conversation's mastery % or spaced-repetition state.
+Not wired into spaced repetition yet (a natural later step for the §19 stage-5
+"story reconstruction" slot).
+
 ## Status
 
-Phases 0–2 complete: dashboard, one seed conversation, conversation display
-modes, recall cards, production exercises (with optional `| English` gloss on
-model answers), quiz grading, error log, mastery, atomic refresh-safe
-persistence, **and spaced-repetition review** (real questions, due scheduling,
-missed-first ranking, refresh-safe sessions, Study-Today priority). 40 tests
-passing.
+Phases 0–2 complete plus §21: dashboard, seed conversations, conversation
+display modes, recall cards, production exercises (with optional `| English`
+gloss on model answers), quiz grading, error log, mastery, atomic refresh-safe
+persistence, **spaced-repetition review** (real questions, due scheduling,
+missed-first ranking, refresh-safe sessions, Study-Today priority), **and
+conversation reconstruction** (§21, generated, self-rated, mastery-neutral).
+57 tests passing.
 
 Not yet built (later phases): pattern & vocabulary banks (§22–23),
-conversation-reconstruction lesson exercises (§21), speaking/audio mode polish
-(§13), Turn-2 / higher-difficulty content, more seed conversations, packaging
-(§29).
+reconstruction wired into spaced repetition, speaking/audio mode polish (§13),
+Turn-2 / higher-difficulty content, more seed conversations, packaging (§29).

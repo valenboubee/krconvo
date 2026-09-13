@@ -42,7 +42,8 @@
           module: rating.getAttribute("data-module"),
           exercise: rating.getAttribute("data-exercise"),
           rating: val,
-          kind: exercise.getAttribute("data-type") === "card" ? "comprehension" : "production",
+          kind: exercise.getAttribute("data-type") === "card" ? "comprehension"
+                : (rating.getAttribute("data-kind") || "production"),
           prompt: rating.getAttribute("data-prompt"),
           model: rating.getAttribute("data-model"),
           answer: input ? input.value : "",
@@ -51,8 +52,8 @@
     });
   });
 
-  // ---- Persist typed answers (respond) on blur ----
-  document.querySelectorAll(".exercise.respond").forEach(function (ex) {
+  // ---- Persist typed answers (respond + reconstruction) on blur ----
+  document.querySelectorAll(".exercise.respond, .exercise.reconstruct").forEach(function (ex) {
     var input = ex.querySelector(".answer-input");
     if (!input) return;
     input.addEventListener("blur", function () {

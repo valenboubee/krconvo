@@ -288,6 +288,112 @@ def render_quiz(module_id, ex) -> str:
     </div>"""
 
 
+# ---- Conversation reconstruction (spec §21) --------------------------------
+# Items are generated deterministically by engine.reconstruction() from the
+# conversation's turns. Each one reuses the same try -> reveal -> self-rate
+# widget as cards/responds (so persistence, refresh-safety and the error log
+# come for free), but its exercise id is not in the mastery formula.
+
+def _section_a_html(module) -> str:
+    for sec in module["sections"]:
+        if sec["title"].startswith("A"):
+            return "".join(el.get("html", "") for el in sec["elements"] if el["type"] == "md")
+    return ""
+
+
+def _recon_convo_html(rows, show_en=True) -> str:
+    out = []
+    for c in rows:
+        if c.get("blank"):
+            ko = "<span class='recon-blank'>______</span>"
+        else:
+            ko = esc(c.get("korean", ""))
+        en = ""
+        if show_en and c.get("english") and not c.get("blank"):
+            en = f"<div class='en'>{esc(c['english'])}</div>"
+        out.append(
+            f"<div class='turn'><div class='speaker'>{esc(c.get('speaker', ''))}</div>"
+            f"<div class='lines'><div class='ko'>{ko}</div>{en}</div></div>"
+        )
+    return f"<div class='recon-convo'>{''.join(out)}</div>"
+
+
+def _recon_body(module, item):
+    """Return (tag, prompt_html, answer_html, data_prompt, data_model, rows,
+    reveal_label) for one reconstruction item, keyed by its kind."""
+    kind = item["kind"]
+    if kind == "speaker":
+        prompt = (f"<p>Say <strong>{esc(item['speaker'])}</strong>'s line in Korean:</p>"
+                  f"<p class='recon-en'>“{esc(item['english'])}”</p>")
+        answer = f"<div class='answer-label'>Korean line</div><div class='answer-body'>{esc(item['answer_ko'])}</div>"
+        return "SPEAKER RECALL", prompt, answer, item["english"], item["answer_ko"], 2, "Reveal line"
+    if kind == "phrase":
+        masked = esc(item["masked"]).replace("____", "<span class='recon-blank'>____</span>")
+        prompt = (f"<p>Fill in the blank ({esc(item['speaker'])}):</p>"
+                  f"<p class='recon-line'>{masked}</p>"
+                  f"<p class='recon-en'>“{esc(item['english'])}”</p>")
+        answer = (f"<div class='answer-label'>Missing phrase</div>"
+                  f"<div class='answer-body'>{esc(item['answer_phrase'])}</div>"
+                  f"<div class='recon-full'>Full line: {esc(item['answer_ko'])}</div>")
+        return "MISSING PHRASE", prompt, answer, item["masked"], item["answer_phrase"], 2, "Reveal phrase"
+    if kind == "line":
+        prompt = (f"<p>Supply the missing line:</p>{_recon_convo_html(item['context'], show_en=False)}"
+                  f"<p class='recon-en'>Hint (meaning): “{esc(item['english_hint'])}”</p>")
+        answer = f"<div class='answer-label'>Missing line</div><div class='answer-body'>{esc(item['answer_ko'])}</div>"
+        return "MISSING LINE", prompt, answer, item["english_hint"], item["answer_ko"], 2, "Reveal line"
+    # skeleton
+    speakers = ", ".join(esc(s) for s in item["speakers"])
+    vocab_html = ""
+    if item["vocab"]:
+        lis = "".join(f"<li>{esc(v)}</li>" for v in item["vocab"])
+        vocab_html = f"<div class='answer-label'>Key words</div><ul class='recon-vocab'>{lis}</ul>"
+    prompt = (f"<p>Rebuild the whole conversation from memory — you have the situation, "
+              f"the speakers, and a few key words:</p>"
+              f"<div class='recon-skeleton'>{_section_a_html(module)}"
+              f"<div class='answer-label'>Speakers</div><p>{speakers}</p>{vocab_html}</div>")
+    answer = f"<div class='answer-label'>Full conversation</div>{_recon_convo_html(item['dialogue'])}"
+    return "REBUILD", prompt, answer, "Rebuild the whole conversation", "(full dialogue)", 4, "Reveal conversation"
+
+
+def render_reconstruct_item(module, item) -> str:
+    mid = module["id"]
+    rating = PROGRESS.get_rating(mid, item["id"])
+    saved = PROGRESS.get_answer(mid, item["id"])
+    revealed = "revealed" if (rating or saved) else ""
+    tag, prompt, answer, data_prompt, data_model, rows, reveal_label = _recon_body(module, item)
+
+    def rbtn(val, label):
+        cls = "rate-btn" + (" chosen" if rating == val else "")
+        return f'<button type="button" class="{cls}" data-rate="{val}">{label}</button>'
+
+    return f"""
+    <div class="exercise reconstruct {revealed}" data-type="reconstruct"
+         data-module="{esc(mid)}" data-exercise="{esc(item['id'])}">
+      <div class="tag">{tag}</div>
+      <div class="prompt">{prompt}</div>
+      <textarea class="answer-input" rows="{rows}" placeholder="Reconstruct here...">{esc(saved)}</textarea>
+      <div class="answer">{answer}</div>
+      <button type="button" class="reveal-btn">{esc(reveal_label)}</button>
+      <div class="rating" data-module="{esc(mid)}" data-exercise="{esc(item['id'])}"
+           data-prompt="{esc(data_prompt)}" data-model="{esc(data_model)}" data-kind="reconstruction">
+        <span class="rate-label">Self-rate:</span>
+        {rbtn('got', 'Got it')}{rbtn('mostly', 'Mostly')}{rbtn('missed', 'Missed')}
+      </div>
+    </div>"""
+
+
+def render_reconstruct_section(module) -> str:
+    items = engine.reconstruction(module)
+    if not items:
+        return ""
+    body = "".join(render_reconstruct_item(module, it) for it in items)
+    intro = ('<p class="muted">Rebuild this conversation from memory — retrieve the lines, '
+             'the phrases, and finally the whole thing. Try first, then reveal and self-rate. '
+             "This is retrieval practice; it doesn't change your mastery score.</p>")
+    return (f'<section class="lesson-section reconstruct-section">'
+            f'<h2>Reconstruct the Conversation</h2>{intro}{body}</section>')
+
+
 def render_element(module_id, el) -> str:
     t = el["type"]
     if t == "md":
@@ -308,12 +414,22 @@ def render_lesson(module) -> str:
     meta = module["meta"]
     mp = PROGRESS.module(mid)
 
+    # Reconstruction is a generated section (not authored in the .md); slot it
+    # in after the lesson body and just before the Quiz Check.
+    recon_html = render_reconstruct_section(module)
+    recon_inserted = False
+
     sections_html = []
     for sec in module["sections"]:
+        if recon_html and not recon_inserted and sec["title"].lower().startswith("quiz"):
+            sections_html.append(recon_html)
+            recon_inserted = True
         els = "".join(render_element(mid, el) for el in sec["elements"])
         title = esc(sec["title"]) if sec["title"] else ""
         head = f"<h2>{title}</h2>" if title else ""
         sections_html.append(f'<section class="lesson-section">{head}{els}</section>')
+    if recon_html and not recon_inserted:
+        sections_html.append(recon_html)
 
     tags = []
     if meta.get("speech_level"):

@@ -33,6 +33,9 @@ progress saved), plus other options and why Vercel doesn't fit.
 - **Recall cards** and **production exercises** — try first, reveal, self-rate.
   Personal model answers include an English translation.
 - **Quizzes** with instant grading.
+- **Conversation reconstruction** — a generated section that rebuilds the
+  dialogue from memory (speaker recall, missing phrase, missing line, and a
+  full skeleton rebuild). Retrieval practice; it doesn't change your mastery.
 - **Spaced repetition** — finish a conversation and it comes back as *real
   review questions* on a 1/3/7/14/30/60-day schedule. Missed items come first;
   sessions survive a refresh.
